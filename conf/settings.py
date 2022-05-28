@@ -264,8 +264,8 @@ CELERY_BROKER_URL = "redis://redis:6379"
 CELERY_RESULT_BACKEND = "redis://redis:6379"
 
 CELERY_BEAT_SCHEDULE = {
-    'refresh-rating-every-minute': {
+    'refresh-rating-every-hour': {
         'task': 'news.tasks.update_rating',
-        'schedule': crontab(minute="*/1")
+        'schedule': crontab(hour="*/1")
     },
 }
