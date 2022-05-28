@@ -1,0 +1,64 @@
+{% extends 'news/base.html' %}
+{% block content %}
+<a href="{% url 'post_list' %}">HOME</a>
+<div style="height:50px"></div>
+заголовок - {{ post.title }}
+<div style="height:50px"></div>
+<img style="max-height:400px;max-width:400px" src="{{ post.preview.url }}">
+<div style="height:50px"></div>
+Содержание - {{ post.content }}
+<div style="height:50px"></div>
+{% if user.is_authenticated and post.in_favorite %}
+<form method="post" action="{% url 'remove_favorite' %}">
+    {% csrf_token %}
+    <input type="hidden" value="{{ user.profile.id }}" name="user">
+    <input type="hidden" value="{{ post.id }}" name="post">
+    <button type="submit">Убрать из избранного</button>
+</form>
+{% elif user.is_authenticated %}
+<form method="post" action="{% url 'add_favorite' %}">
+    {% csrf_token %}
+    <input type="hidden" value="{{ user.profile.id }}" name="user">
+    <input type="hidden" value="{{ post.id }}" name="post">
+
+
+    <button type="submit">Добавить в избранное</button>
+</form>
+{% endif %}
+
+<form method="post" action="{% url 'like' %}">
+    {% csrf_token %}
+    <input type="hidden" value="{{ post.id }}" name="post">
+    <input type="hidden" value="1" name="value">
+    {{ ip }}
+    {% if post.your_value == 1 %}
+    <button style="background-color:green" type="submit">лайк</button>
+    {% else %}
+    <button type="submit">лайк</button>
+    {% endif %}
+    {{ post.likes_count }}
+</form>
+
+
+<form method="post" action="{% url 'like' %}">
+    {% csrf_token %}
+    <input type="hidden" value="{{ post.id }}" name="post">
+    <input type="hidden" value="-1" name="value">
+    {% if post.your_value == -1 %}
+    <button style="background-color:red" type="submit">дизлайк</button>
+    {% else %}
+    <button type="submit">дизлайк</button>
+    {% endif %}
+    {{ post.dislikes_count }}
+</form>
+<div style="height:50px">
+
+</div>
+Рейтинг - {{ post.rating }}
+<div style="height:50px"></div>
+<div style="height:50px">
+    просмотры - {{ post.views }}
+</div>
+Автор - {{ post.author }}
+
+{% endblock content %}

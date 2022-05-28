@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<li>
+    {% if user.is_authenticated %}
+    <span>{{ user.username }}</span>
+    <a href="{% url 'account_logout' %}"
+       style="">
+        Выход
+    </a>
+    {% else %}
+    <a href="{% url 'account_login' %}"
+       style="">
+        Вход
+    </a>
+    <a href="{% url 'account_signup' %}"
+       style="">
+        Регистрация
+    </a>
+    {% endif %}
+</li>
+<div style="margin-left:300px">
+    {% block content %}
+    {% endblock content %}
+</div>
+</body>
+<script>
+    let cords = ['scrollX','scrollY'];
+// Перед закрытием записываем в локалсторадж window.scrollX и window.scrollY как scrollX и scrollY
+window.addEventListener('unload', e => cords.forEach(cord => localStorage[cord] = window[cord]));
+// Прокручиваем страницу к scrollX и scrollY из localStorage (либо 0,0 если там еще ничего нет)
+window.scroll(...cords.map(cord => localStorage[cord]));
+
+</script>
+
+</html>

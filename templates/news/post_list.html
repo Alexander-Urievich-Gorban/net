@@ -1,0 +1,170 @@
+{% extends 'news/base.html' %}
+{% block content %}
+<style>
+    .social-like, .social-dislike {
+    border: none;
+    outline: none;
+    font-size: 16px;
+    /*width: 48%;*/
+    background-color: #03A9F4;
+    color: #fff;
+}
+
+.social-like {
+    border-top-left-radius: 5px;
+}
+
+.social-dislike {
+    border-top-right-radius: 5px;
+}
+
+.count, .like, .dislike {
+    padding:10px;
+}
+
+.count, .dislike {
+    background-color: #03A9F4;
+    border-radius: 50%;
+    font-size:12px;
+}
+
+.dislike {
+    margin-left: -13px;
+}
+
+.count {
+    margin-right: -10px;
+}
+.button7 {
+  font-weight: 700;
+  color: white;
+  text-decoration: none;
+  padding: .8em 1em calc(.8em + 3px);
+  border-radius: 3px;
+  background: rgb(64,199,129);
+  box-shadow: 0 -3px rgb(53,167,110) inset;
+  transition: 0.2s;
+}
+.button7:hover { background: rgb(53, 167, 110); }
+.button7:active {
+  background: rgb(33,147,90);
+  box-shadow: 0 3px rgb(33,147,90) inset;
+}
+
+</style>
+{% if user.is_authenticated %}
+<a href="{% url 'post_create' %}">Создать свой пост</a>
+{% endif %}
+<form style="height:50px" method="get" action="{% url 'post_list' %}" name="q">
+    пагинация
+    <input type="number" name="paginate">
+    поиск
+    <input type="text" name="search">
+    {{ filter.form }}
+    {% if user.is_authenticated %}
+    <input hidden="hidden" id='fav' type="submit" name="favorite">
+
+    <label class="button7" for="fav">Только избранные</label>
+    {% endif %}
+    <input hidden="hidden" id='like' type="submit" name="liked">
+
+    <label class="button7" for="like">Только лайкнутые</label>
+    <input hidden="hidden" id='all' type="submit">
+    <label class="button7" for="all">Все</label>
+    <div style="height:50px">
+
+    </div>
+    <button class="button7" type="submit">Найти</button>
+</form>
+
+{% for post in post_list %}
+
+<div style="height:50px">
+
+</div>
+<h1>{{ post.title }}</h1>
+<div style="height:50px">
+
+</div>
+<img style="max-height:400px;max-width:400px" src="{{ post.preview.url }}">
+<div style="height:50px">
+
+</div>
+Короткое описание:
+{{ post.short_description }}
+
+<div style="height:50px">
+
+</div>
+{% if user.is_authenticated and post.in_favorite %}
+<form method="post" action="{% url 'remove_favorite' %}">
+    {% csrf_token %}
+    <input type="hidden" value="{{ user.profile.id }}" name="user">
+    <input type="hidden" value="{{ post.id }}" name="post">
+    <button type="submit">Убрать из избранного</button>
+</form>
+{% elif user.is_authenticated %}
+<form method="post" action="{% url 'add_favorite' %}">
+    {% csrf_token %}
+    <input type="hidden" value="{{ user.profile.id }}" name="user">
+    <input type="hidden" value="{{ post.id }}" name="post">
+
+
+    <button type="submit">Добавить в избранное</button>
+</form>
+{% endif %}
+
+
+<form method="post" action="{% url 'like' %}">
+    {% csrf_token %}
+    <input type="hidden" value="{{ post.id }}" name="post">
+    <input type="hidden" value="1" name="value">
+    {{ ip }}
+    {% if post.your_value == 1 %}
+    <button style="background-color:green" type="submit">лайк</button>
+    {% else %}
+    <button type="submit">лайк</button>
+    {% endif %}
+    {{ post.likes_count }}
+</form>
+
+
+<form method="post" action="{% url 'like' %}">
+    {% csrf_token %}
+    <input type="hidden" value="{{ post.id }}" name="post">
+    <input type="hidden" value="-1" name="value">
+    {% if post.your_value == -1 %}
+    <button style="background-color:red" type="submit">дизлайк</button>
+    {% else %}
+    <button type="submit">дизлайк</button>
+    {% endif %}
+    {{ post.dislikes_count }}
+</form>
+<div style="height:50px">
+
+</div>
+рейтинг {{ post.rating }}
+<div style="height:50px">
+
+</div>
+просмотры {{ post.views }}
+<div style="height:50px"></div>
+<div style="height:50px"><a href="{{ post.get_absolute_url }}">Полное описание</a></div>
+{% endfor %}
+<div style="height:50px"></div>
+
+
+<div class="grid-img-right mt-4 text-right bg bg1">
+    {% include 'include/pagination.html' %}
+</div>
+</div>
+
+<script>
+$(document).ready(function(){
+    setTimeout(function(){
+        window.scrollTo(0, 0);
+    }, 1);
+});
+</script>
+
+{% endblock content %}

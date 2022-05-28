@@ -1,0 +1,48 @@
+version: '3.7'
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./:/usr/src/app/
+    ports:
+      - 8000:8000
+    env_file:
+      - ./.env.dev
+    depends_on:
+      - db
+  redis:
+    image: redis:alpine
+  celery:
+    build: .
+    command: celery -A conf worker -l info
+    volumes:
+      - ./:/usr/src/app/
+    env_file:
+      - ./.env.dev
+    depends_on:
+      - redis
+      - db
+      - web
+  celery-beat:
+    build: .
+    command: celery -A conf beat -l info
+    volumes:
+      - ./:/usr/src/app/
+    env_file:
+      - ./.env.dev
+    depends_on:
+      - redis
+      - db
+      - web
+  db:
+    image: postgres:12.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_NAME=social_net
+      - POSTGRES_PORT=5432
+      - DATABASE=postgres
+volumes:
+  postgres_data:
+
