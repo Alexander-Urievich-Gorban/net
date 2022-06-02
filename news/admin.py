@@ -8,7 +8,6 @@ from .models import Post, PostLike, Profile
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    """Фильмы"""
     list_display = ("title", "article")
     list_filter = ("article", "title", "author")
     search_fields = ("title", "author")
